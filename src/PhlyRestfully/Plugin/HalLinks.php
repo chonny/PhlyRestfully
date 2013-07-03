@@ -889,7 +889,7 @@ class HalLinks extends AbstractHelper implements
         if (!$hydrator) {
             return (array) $resource;
         }
-        $result = $this->getEventManager()
+        $response = $this->getEventManager()
                 ->trigger(__FUNCTION__,
                         $this,
                         array(
@@ -897,7 +897,8 @@ class HalLinks extends AbstractHelper implements
                             'resource' => $resource
                             )
                         );
-        if($result instanceof \Traversable || is_array($result)) return $result;
+        $result = $response->last();
+        if(is_array($result)) return $result;
         
 
         return $hydrator->extract($resource);
