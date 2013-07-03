@@ -885,22 +885,37 @@ class HalLinks extends AbstractHelper implements
      */
     protected function convertResourceToArray($resource)
     {
+       if(!is_object($resource)){
+           return (array)$resource;
+       }
+       
+        $responses = $this->getEventManager()
+                ->trigger(__FUNCTION__.'object',
+                        $this,
+                        array(
+                            'resource' => $resource
+                            )
+                        );
+        $result = $responses->last();
+        if(is_array($result)) {
+             return $result;
+        }
         $hydrator = $this->getHydratorForResource($resource);
         if (!$hydrator) {
             return (array) $resource;
         }
-        $response = $this->getEventManager()
-                ->trigger(__FUNCTION__,
+        $responses = $this->getEventManager()
+                ->trigger(__FUNCTION__.'hydrator',
                         $this,
                         array(
                             'hydrator' => $hydrator,
                             'resource' => $resource
                             )
                         );
-        $result = $response->last();
-        if(is_array($result)) return $result;
-        
-
+        $result = $responses->last();
+        if(is_array($result)) {
+             return $result;
+        }
         return $hydrator->extract($resource);
     }
 
