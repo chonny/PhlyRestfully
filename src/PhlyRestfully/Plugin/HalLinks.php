@@ -889,6 +889,16 @@ class HalLinks extends AbstractHelper implements
         if (!$hydrator) {
             return (array) $resource;
         }
+        $result = $this->getEventManager()
+                ->trigger(__FUNCTION__,
+                        $this,
+                        array(
+                            'hydrator' => $hydrator,
+                            'resource' => $resource
+                            )
+                        );
+        if($result instanceof \Traversable || is_array($result)) return $result;
+        
 
         return $hydrator->extract($resource);
     }

@@ -1,5 +1,5 @@
 {
-    "name": "phly/phly-restfully",
+    "name": "chonny/phly-restfully",
     "description": "ZF2 Module providing structure for RESTful resources",
     "type": "library",
     "license": "BSD-2-Clause",
@@ -19,8 +19,8 @@
     ],
     "repositories": [
         {
-            "type": "composer",
-            "url": "https://packages.zendframework.com"
+            "type": "vcs",
+            "url": "https://github.com/weierophinney/PhlyRestfully"
         }
     ],
     "require": {
