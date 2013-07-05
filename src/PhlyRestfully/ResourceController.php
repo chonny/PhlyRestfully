@@ -572,6 +572,43 @@ class ResourceController extends AbstractRestfulController
      * @param  array $data
      * @return Response|ApiProblem|HalResource
      */
+    public function update($id, $data)
+    {
+        if ($id && !$this->isMethodAllowedForResource()) {
+            return $this->createMethodNotAllowedResponse($this->resourceHttpOptions);
+        }
+        if (!$id && !$this->isMethodAllowedForCollection()) {
+            return $this->createMethodNotAllowedResponse($this->collectionHttpOptions);
+        }
+
+        $events = $this->getEventManager();
+        $events->trigger('update.pre', $this, array('id' => $id, 'data' => $data));
+
+        try {
+            $resource = $this->resource->update($id, $data);
+        } catch (\Exception $e) {
+            $code = $e->getCode() ?: 500;
+            return new ApiProblem($code, $e);
+        }
+
+        if ($resource instanceof ApiProblem) {
+            return $resource;
+        }
+
+        $plugin   = $this->plugin('HalLinks');
+        $resource = $plugin->createResource($resource, $this->route, $this->getIdentifierName());
+
+        $events->trigger('update.post', $this, array('id' => $id, 'data' => $data, 'resource' => $resource));
+        return $resource;
+    }
+
+    /**
+     * Update an existing resource
+     *
+     * @param  int|string $id
+     * @param  array $data
+     * @return Response|ApiProblem|HalResource
+     */
     public function patchList($data)
     {
        
@@ -599,8 +636,6 @@ class ResourceController extends AbstractRestfulController
         $events->trigger('update.post', $this, array('id' => $id, 'data' => $data, 'resource' => $resource));
         return $resource;
     }
-
-   
     /**
      * Update an existing collection of resources
      *
