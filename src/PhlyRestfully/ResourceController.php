@@ -572,20 +572,18 @@ class ResourceController extends AbstractRestfulController
      * @param  array $data
      * @return Response|ApiProblem|HalResource
      */
-    public function update($id, $data)
+    public function patchList($data)
     {
-        if ($id && !$this->isMethodAllowedForResource()) {
-            return $this->createMethodNotAllowedResponse($this->resourceHttpOptions);
-        }
-        if (!$id && !$this->isMethodAllowedForCollection()) {
+       
+        if (!$this->isMethodAllowedForCollection()) {
             return $this->createMethodNotAllowedResponse($this->collectionHttpOptions);
         }
 
         $events = $this->getEventManager();
-        $events->trigger('update.pre', $this, array('id' => $id, 'data' => $data));
+        $events->trigger('patchList.pre', $this, array('data' => $data));
 
         try {
-            $resource = $this->resource->update($id, $data);
+            $resource = $this->resource->patchList($data);
         } catch (\Exception $e) {
             $code = $e->getCode() ?: 500;
             return new ApiProblem($code, $e);
@@ -602,6 +600,7 @@ class ResourceController extends AbstractRestfulController
         return $resource;
     }
 
+   
     /**
      * Update an existing collection of resources
      *

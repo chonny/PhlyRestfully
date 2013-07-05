@@ -255,6 +255,41 @@ class Resource implements ResourceInterface
      * @return array|object
      * @throws Exception\InvalidArgumentException
      */
+    public function patchList($data)
+    {
+        if (!is_array($data)) {
+            throw new Exception\InvalidArgumentException(sprintf(
+                'Data provided to patchList must be either a multidimensional array  "%s"',
+                gettype($data)
+            ));
+        }
+        $events  = $this->getEventManager();
+        $event   = $this->prepareEvent(__FUNCTION__, array('data' => $data));
+        $results = $events->triggerUntil($event, function($result) {
+            return $result instanceof ApiProblem;
+        });
+        $last    = $results->last();
+        if (!is_array($last) && !is_object($last)) {
+            return $data;
+        }
+        return $last;
+    }
+    /**
+     * Update (replace) an existing collection of items
+     *
+     * Replaces the collection with  the items contained in $data.
+     * $data should be a multidimensional array or array of objects; if
+     * otherwise, an exception will be raised.
+     *
+     * Like update(), the return value of the last executed listener will be
+     * returned, as long as it is an array or object; otherwise, $data is
+     * returned. If you wish to indicate failure to update, raise a
+     * PhlyRestfully\Exception\UpdateException.
+     *
+     * @param  array $data
+     * @return array|object
+     * @throws Exception\InvalidArgumentException
+     */
     public function replaceList($data)
     {
         if (!is_array($data)) {
@@ -263,19 +298,6 @@ class Resource implements ResourceInterface
                 gettype($data)
             ));
         }
-        array_walk($data, function($value, $key) use(&$data) {
-            if (is_array($value)) {
-                $data[$key] = (object) $value;
-                return;
-            }
-
-            if (!is_object($value)) {
-                throw new Exception\InvalidArgumentException(sprintf(
-                    'Data provided to replaceList must contain only arrays or objects; received "%s"',
-                    gettype($value)
-                ));
-            }
-        });
         $events  = $this->getEventManager();
         $event   = $this->prepareEvent(__FUNCTION__, array('data' => $data));
         $results = $events->triggerUntil($event, function($result) {

@@ -80,6 +80,13 @@ interface ResourceInterface extends EventManagerAwareInterface
      * @return array|object
      */
     public function patch($id, $data);
+    /**
+     * Partial update of an existing record
+     *
+     * @param  array $data
+     * @return array|object
+     */
+    public function patchList($data);
 
     /**
      * Delete an existing record
