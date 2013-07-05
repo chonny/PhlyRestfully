@@ -890,31 +890,29 @@ class HalLinks extends AbstractHelper implements
        }
        
         $responses = $this->getEventManager()
-                ->trigger(__FUNCTION__.'object',
+                ->trigger(__FUNCTION__.'.object',
                         $this,
                         array(
                             'resource' => $resource
                             )
                         );
-        $result = $responses->last();
-        if(is_array($result)) {
-             return $result;
+        if(is_array($responses->last())) {
+             return $responses->last();
         }
         $hydrator = $this->getHydratorForResource($resource);
         if (!$hydrator) {
             return (array) $resource;
         }
         $responses = $this->getEventManager()
-                ->trigger(__FUNCTION__.'hydrator',
+                ->trigger(__FUNCTION__.'.hydrator',
                         $this,
                         array(
                             'hydrator' => $hydrator,
                             'resource' => $resource
                             )
                         );
-        $result = $responses->last();
-        if(is_array($result)) {
-             return $result;
+        if(is_array($responses->last())) {
+             return $responses->last();
         }
         return $hydrator->extract($resource);
     }
