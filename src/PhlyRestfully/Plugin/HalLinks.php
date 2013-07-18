@@ -349,6 +349,10 @@ class HalLinks extends AbstractHelper implements
      */
     public function renderResource(HalResource $halResource)
     {
+        
+        $this->getEventManager()->trigger('render.resource',$this,[
+            'resource' => $halResource
+        ]);
         $resource = $halResource->resource;
         $id       = $halResource->id;
         $links    = $this->fromResource($halResource);
@@ -502,9 +506,6 @@ class HalLinks extends AbstractHelper implements
      */
     public function fromResource(LinkCollectionAwareInterface $resource)
     {
-        $this->getEventManager()->trigger('hallinks.build',$this,
-            ['resource' => $resource]
-        );
         return $this->fromLinkCollection($resource->getLinks());
     }
 
@@ -559,12 +560,6 @@ class HalLinks extends AbstractHelper implements
             ));
         }
         $resource->getLinks()->add($link);
-        $this->getEventManager()->trigger(__FUNCTION__, $this, 
-                    [ 
-                        'resource' => $resource ,
-                        'object'   => $object
-                    ]
-        );
         return $resource;
     }
 
@@ -593,6 +588,7 @@ class HalLinks extends AbstractHelper implements
                 );
             }
             $resource = new HalResource($resource, $id);
+            
         }
 
         $this->injectSelfLink($resource, $route, $identifierName);
@@ -793,7 +789,6 @@ class HalLinks extends AbstractHelper implements
         $metadataMap          = $this->getMetadataMap();
 
         foreach ($halCollection->collection as $resource) {
-            $object = $resource;
             $eventParams = new ArrayObject(array(
                 'collection'   => $halCollection,
                 'resource'     => $resource,
@@ -802,9 +797,9 @@ class HalLinks extends AbstractHelper implements
                 'routeOptions' => $resourceRouteOptions,
             ));
             $events->trigger('renderCollection.resource', $this, $eventParams);
+            
+            
            
-            
-            
             $resource = $eventParams['resource'];
             if ($resource instanceof HalResource) {
                 $collection[] = $this->renderResource($resource);
@@ -814,7 +809,6 @@ class HalLinks extends AbstractHelper implements
             if (!is_array($resource)) {
                 $resource = $this->convertResourceToArray($resource);
             }
-
             foreach ($resource as $key => $value) {
                 if (is_object($value) && $metadataMap->has($value)) {
                     $value = $this->createResourceFromMetadata($value, $metadataMap->get($value));
@@ -841,7 +835,7 @@ class HalLinks extends AbstractHelper implements
             } else {
                 $links = new LinkCollection();
             }
-
+            
             $selfLink = new Link('self');
             $selfLink->setRoute(
                 $eventParams['route'],
@@ -849,13 +843,13 @@ class HalLinks extends AbstractHelper implements
                 $eventParams['routeOptions']
             );
             $links->add($selfLink);
+            $events->trigger('resource.link.build', $this, 
+                    [
+                        'resource' => $eventParams['resource'],
+                        'links' => $links,
+            ]);
 
             $resource['_links'] = $this->fromLinkCollection($links);
-            $events->trigger('renderCollection.resource.post', $this, 
-                    [
-                        'object' => $object,
-                        'resource' => $resource,
-                    ]);
             $collection[] = $resource;
             
         }
