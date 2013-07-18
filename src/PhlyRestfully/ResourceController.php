@@ -470,7 +470,7 @@ class ResourceController extends AbstractRestfulController
         $collection->setIdentifierName($this->getIdentifierName());
         $collection->setResourceRoute($this->route);
         $collection->setPage($this->getRequest()->getQuery('page', 1));
-        $collection->setPageSize($this->pageSize);
+        $collection->setPageSize($this->getRequest()->getQuery('page', $this->pageSize));
         $collection->setCollectionName($this->collectionName);
 
         $events->trigger('getList.post', $this, array('collection' => $collection));
@@ -620,21 +620,27 @@ class ResourceController extends AbstractRestfulController
         $events->trigger('patchList.pre', $this, array('data' => $data));
 
         try {
-            $resource = $this->resource->patchList($data);
+            $collection = $this->resource->patchList($data);
         } catch (\Exception $e) {
             $code = $e->getCode() ?: 500;
             return new ApiProblem($code, $e);
         }
 
-        if ($resource instanceof ApiProblem) {
-            return $resource;
+        if ($collection instanceof ApiProblem) {
+            return $collection;
         }
 
-        $plugin   = $this->plugin('HalLinks');
-        $resource = $plugin->createResource($resource, $this->route, $this->getIdentifierName());
+        $plugin = $this->plugin('HalLinks');
+        $collection = $plugin->createCollection($collection, $this->route);
+        $collection->setCollectionRoute($this->route);
+        $collection->setIdentifierName($this->getIdentifierName());
+        $collection->setResourceRoute($this->route);
+        $collection->setPage($this->getRequest()->getQuery('page', 1));
+        $collection->setPageSize($this->pageSize);
+        $collection->setCollectionName($this->collectionName);
 
-        $events->trigger('update.post', $this, array('id' => $id, 'data' => $data, 'resource' => $resource));
-        return $resource;
+        $events->trigger('patchList.post', $this, array('data' => $data, 'collection' => $collection));
+        return $collection;
     }
     /**
      * Update an existing collection of resources
