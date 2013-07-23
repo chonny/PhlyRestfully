@@ -470,7 +470,7 @@ class ResourceController extends AbstractRestfulController
         $collection->setIdentifierName($this->getIdentifierName());
         $collection->setResourceRoute($this->route);
         $collection->setPage($this->getRequest()->getQuery('page', 1));
-        $collection->setPageSize($this->getRequest()->getQuery('page', $this->pageSize));
+        $collection->setPageSize($this->getRequest()->getQuery('pageSize', $this->pageSize));
         $collection->setCollectionName($this->collectionName);
 
         $events->trigger('getList.post', $this, array('collection' => $collection));

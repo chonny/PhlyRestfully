@@ -349,7 +349,6 @@ class HalLinks extends AbstractHelper implements
      */
     public function renderResource(HalResource $halResource)
     {
-        
         $this->getEventManager()->trigger('render.resource',$this,[
             'resource' => $halResource
         ]);
