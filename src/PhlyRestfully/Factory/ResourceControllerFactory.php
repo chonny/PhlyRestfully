@@ -108,8 +108,10 @@ class ResourceControllerFactory implements AbstractFactoryInterface
         }
 
         $events = $services->get('EventManager');
+        /* @var $events \Zend\EventManager\EventManager */
         $events->attach($listener);
         $events->setIdentifiers($resourceIdentifiers);
+       
 
         $resource = new Resource();
         $resource->setEventManager($events);
@@ -124,7 +126,9 @@ class ResourceControllerFactory implements AbstractFactoryInterface
         $controller->setEventManager($events);
         $controller->setResource($resource);
         $this->setControllerOptions($config, $controller);
-
+        if($listener instanceof \Zend\EventManager\SharedListenerAggregateInterface){
+            $events->getSharedManager()->attachAggregate($listener);
+        }
         return $controller;
     }
 
