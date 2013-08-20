@@ -350,7 +350,7 @@ class HalLinks extends AbstractHelper implements
     public function renderResource(HalResource $halResource)
     {
         $this->getEventManager()->trigger('render.resource',$this,[
-            'resource' => $halResource
+            'resource' => $halResource->resource
         ]);
         $resource = $halResource->resource;
         $id       = $halResource->id;
@@ -586,7 +586,13 @@ class HalLinks extends AbstractHelper implements
                     'No resource identifier present following resource creation.'
                 );
             }
-            $resource = new HalResource($resource, $id);
+            $eventParams = new ArrayObject(['resource' => $resource]);
+            $this->getEventManager()->trigger('create.resource',$this,$eventParams);
+            if($eventParams['resource'] instanceof HalResource){
+                $resource = $eventParams['resource'];
+            }else{
+                $resource = new HalResource($resource, $id);
+            }
             
         }
 
