@@ -12,7 +12,7 @@ use Zend\Http\Response;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\Mvc\MvcEvent;
 use Zend\Paginator\Paginator;
-
+use Zend\View\Model\ViewModel;
 /**
  * Controller for handling resources.
  *
@@ -303,11 +303,12 @@ class ResourceController extends AbstractRestfulController
             $code = $e->getCode() ?: 500;
             return new ApiProblem($code, $e);
         }
-
+        if($resource instanceof ViewModel){
+            return $resource;
+        }
         if ($resource instanceof ApiProblem) {
             return $resource;
         }
-
         $plugin   = $this->plugin('HalLinks');
         $resource = $plugin->createResource($resource, $this->route, $this->getIdentifierName());
 
@@ -420,13 +421,15 @@ class ResourceController extends AbstractRestfulController
 
             return new ApiProblem($code, $e);
         }
+        if($resource instanceof ViewModel){
+            return $resource;
+        }
 
         $resource = $resource ?: new ApiProblem(404, 'Resource not found.');
 
         if ($resource instanceof ApiProblem) {
             return $resource;
         }
-
         $plugin   = $this->plugin('HalLinks');
         $resource = $plugin->createResource($resource, $this->route, $this->getIdentifierName());
 
@@ -459,7 +462,9 @@ class ResourceController extends AbstractRestfulController
 
             return new ApiProblem($code, $e);
         }
-
+        if($resource instanceof ViewModel){
+            return $resource;
+        }
         if ($collection instanceof ApiProblem) {
             return $collection;
         }
