@@ -303,10 +303,7 @@ class ResourceController extends AbstractRestfulController
             $code = $e->getCode() ?: 500;
             return new ApiProblem($code, $e);
         }
-        if($resource instanceof ViewModel){
-            return $resource;
-        }
-        if ($resource instanceof ApiProblem) {
+        if ($resource instanceof ApiProblem || $resource instanceof ViewModel){
             return $resource;
         }
         $plugin   = $this->plugin('HalLinks');
@@ -356,7 +353,7 @@ class ResourceController extends AbstractRestfulController
 
         $result = $result ?: new ApiProblem(422, 'Unable to delete resource.');
 
-        if ($result instanceof ApiProblem) {
+        if ($result instanceof ApiProblem || $result instanceof ViewModel){
             return $result;
         }
 
@@ -387,7 +384,7 @@ class ResourceController extends AbstractRestfulController
 
         $result = $result ?: new ApiProblem(422, 'Unable to delete collection.');
 
-        if ($result instanceof ApiProblem) {
+         if ($result instanceof ApiProblem || $result instanceof ViewModel){
             return $result;
         }
 
@@ -421,13 +418,11 @@ class ResourceController extends AbstractRestfulController
 
             return new ApiProblem($code, $e);
         }
-        if($resource instanceof ViewModel){
-            return $resource;
-        }
+        
 
         $resource = $resource ?: new ApiProblem(404, 'Resource not found.');
 
-        if ($resource instanceof ApiProblem) {
+        if ($resource instanceof ApiProblem || $resource instanceof ViewModel){
             return $resource;
         }
         $plugin   = $this->plugin('HalLinks');
@@ -462,10 +457,7 @@ class ResourceController extends AbstractRestfulController
 
             return new ApiProblem($code, $e);
         }
-        if($resource instanceof ViewModel){
-            return $resource;
-        }
-        if ($collection instanceof ApiProblem) {
+        if($collection instanceof ViewModel || $collection instanceof ApiProblem) {
             return $collection;
         }
 
@@ -555,7 +547,7 @@ class ResourceController extends AbstractRestfulController
             return new ApiProblem($code, $e);
         }
 
-        if ($resource instanceof ApiProblem) {
+        if ($resource instanceof ApiProblem || $resource instanceof ViewModel) {
             return $resource;
         }
 
