@@ -182,6 +182,9 @@ class HalCollection implements LinkCollectionAwareInterface
         $this->attributes = $attributes;
         return $this;
     }
+    public function setAttribute($key,$value){
+        $this->attributes[$key] = $value;
+    }
 
     /**
      * Set the collection name (for use within the _embedded object)
