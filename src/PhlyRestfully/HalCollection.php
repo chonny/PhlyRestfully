@@ -289,21 +289,10 @@ class HalCollection implements LinkCollectionAwareInterface
      */
     public function setPage($page)
     {
-        if (!is_int($page) && !is_numeric($page)) {
-            throw new Exception\InvalidArgumentException(sprintf(
-                'Page must be an integer; received "%s"',
-                gettype($page)
-            ));
-        }
-
-        $page = (int) $page;
-        if ($page < 1) {
-            throw new Exception\InvalidArgumentException(sprintf(
-                'Page must be a positive integer; received "%s"',
-                $page
-            ));
-        }
-
+       $page = (int) $page;
+       if($page < 1 ){
+           $page = 1;
+       }
         $this->page = $page;
         return $this;
     }
